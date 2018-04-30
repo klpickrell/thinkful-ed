@@ -4,7 +4,7 @@
 
 # Description:  This is a simple example demonstrating a robust technique for ensembling several multilabel 
 # classifiers that can help solve both the overfitting problem and the meta-parameter estimation search
-# problem.  The intuition that guides this solution is two-fold.  First, it is highly likely that for any
+# problem.  The seemingly paradoxical intuition that guides this solution is two-fold.  First, it is highly likely that for any
 # two estimators, the performance will vary between example classes in a complimentary way, that is, one 
 # will do well where the other does poorly and vice versa.  Second, since both estimators are likely trained on
 # the same data and differ only by meta-parameters, the performance will also likely be correlated.  That is,
