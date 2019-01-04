@@ -6,13 +6,14 @@ import random
 
 class LogisticRegression(object):
 
-    def __init__(self, alpha=0.01, miniters=10, maxiters=100, tolerance=0.5):
+    def __init__(self, alpha=0.01, miniters=10, maxiters=100, tolerance=0.5, C=None):
         self.alpha = alpha
         self.miniters = miniters
         self.maxiters = maxiters
         self.tolerance = tolerance
         self.weights = None
         self.bias = None
+        self.C = C
 
     def fit( self, X, y, shuffle=True):
         ''' fit the model '''
@@ -49,7 +50,11 @@ class LogisticRegression(object):
     
                 error = label - predicted
                 for k in range(n_features):
-                    update = error * X[j,k] - (self.alpha * weights[k])
+                    if self.C is not None:
+                        update = error * X[j,k] - (self.alpha * (weights[k]+(self.C/n_examples * weights[k])))
+                    else:
+                        update = error * X[j,k] - (self.alpha * weights[k])
+
                     weights[k] += rate_n * update
     
                 bias += rate_n * error
@@ -77,13 +82,39 @@ class LogisticRegression(object):
 
 def _main():
     from sklearn.datasets import make_classification
-    from sklearn.metrics  import classification_report
+    from sklearn.metrics  import classification_report, accuracy_score
+    from sklearn.linear_model import LogisticRegression as sklearn_lr
+    from sklearn.preprocessing import StandardScaler
 
     X,y = make_classification( n_samples=1000, n_features=5, n_classes=2 )
-    lr = LogisticRegression()
+    lr = LogisticRegression(C=0.1,maxiters=300)
     lr.fit(X,y)
     predictions = lr.predict(X)
     print( classification_report( y, predictions ) )
+    print( accuracy_score( y, predictions ) )
+
+    print('sklearn')
+    lr = sklearn_lr()
+    lr.fit(X,y)
+    predictions = lr.predict(X)
+    print( classification_report( y, predictions ) )
+    print( accuracy_score( y, predictions ) )
+
+    print( '-'*20 +'standardized data' + '-'*20 )
+    X = StandardScaler().fit_transform(X)
+    lr = LogisticRegression(C=0.1,maxiters=300)
+    lr.fit(X,y)
+    predictions = lr.predict(X)
+    print( classification_report( y, predictions ) )
+    print( accuracy_score( y, predictions ) )
+
+    print('sklearn')
+    lr = sklearn_lr()
+    lr.fit(X,y)
+    predictions = lr.predict(X)
+    print( classification_report( y, predictions ) )
+    print( accuracy_score( y, predictions ) )
+    
 
 if __name__ == '__main__':
     import sys
