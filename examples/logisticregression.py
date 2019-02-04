@@ -15,7 +15,7 @@ class LogisticRegression(object):
         self.bias = None
         self.C = C
 
-    def fit( self, X, y, shuffle=True):
+    def fit( self, X, y, shuffle=True, randinit=False):
         ''' fit the model '''
         if (X is None or not len(X)) or (y is None or not len(y)):
             return self
@@ -32,7 +32,10 @@ class LogisticRegression(object):
         n_examples, n_features = X.shape
         rate = 0.01
     
-        weights = X[0] * 0
+        if randinit:
+            weights = np.random.randn(len(X[0]))
+        else:
+            weights = X[0] * 0
         bias = 0
         n = self.maxiters
         for i in range(n):
@@ -87,11 +90,17 @@ def _main():
     from sklearn.preprocessing import StandardScaler
 
     X,y = make_classification( n_samples=1000, n_features=5, n_classes=2 )
-    lr = LogisticRegression(C=0.1,maxiters=300)
-    lr.fit(X,y)
-    predictions = lr.predict(X)
-    print( classification_report( y, predictions ) )
-    print( accuracy_score( y, predictions ) )
+    for i in range(5):
+        lr = LogisticRegression(C=0.1,maxiters=300)
+        lr.fit(X,y,randinit=True,shuffle=False)
+        predictions = lr.predict(X)
+        print( classification_report( y, predictions ) )
+        print( accuracy_score( y, predictions ) )
+        sv = ''
+        for i,w in enumerate(lr.weights):
+            sv += '{}x{} + '.format(w,i)
+        sv += '{}'.format(lr.bias)
+        print(sv)
 
     print('sklearn')
     lr = sklearn_lr()
