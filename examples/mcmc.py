@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 
 def _main():
-    # add observation data
+    # add observation data here
     obs = np.array( [ 100, 85, 92 ] )
     prior = norm(np.mean(obs),np.std(obs))
     samples = np.zeros(10000)
