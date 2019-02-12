@@ -51,7 +51,8 @@ def logp_ab(value):
 
 def _main():
     
-    data = pd.read_csv('data/jbi-newusers.csv')
+    filename = 'jbi-newusers'
+    data = pd.read_csv(os.path.join('data','{}.csv'.format(filename)))
     names = pd.read_csv('data/names.csv')
     data['name'] = names
     i_to_name = { i : data['name'].iloc[i] for i in range(len(names)) }
@@ -77,8 +78,9 @@ def _main():
     y = data['Total Quality Leads'].values
     N = len(y)
 
+    model_file = 'model_{}_{}.pkl'.format(n_samples,filename)
     n_samples, n_tune = 50000,5000
-    if not os.path.exists( 'model_{}.pkl'.format(n_samples) ):
+    if not os.path.exists(model_file):
         with pm.Model() as model:
 #            ab = pm.HalfFlat('ab',shape=2,testval=np.asarray([1.,1.]))
 #            ab = pm.Uniform('ab',shape=2,testval=np.asarray([0.,1.]))
@@ -94,7 +96,7 @@ def _main():
             with open( 'model_{}.pkl'.format(n_samples), 'wb' ) as fil:
                 pickle.dump( {'model' : model, 'trace' : trace }, fil )
     else:
-        with open( 'model_{}.pkl'.format(n_samples), 'rb' ) as fil:
+        with open( model_file, 'rb' ) as fil:
             r = pickle.load( fil )
             model = r['model']
             trace = r['trace']
