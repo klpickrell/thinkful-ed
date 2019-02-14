@@ -51,7 +51,7 @@ def logp_ab(value):
 
 def _main():
     
-    filename = 'jbi-newusers'
+    filename = 'jbi'
     data = pd.read_csv(os.path.join('data','{}.csv'.format(filename)))
     names = pd.read_csv('data/names.csv')
     data['name'] = names
@@ -69,8 +69,8 @@ def _main():
     performance = [ 2,1,12,0,7,11,12,1,5,0,12,13,1,4,5,12,29,2,1,0,1,2,16,2,5,1,12,1,1,1 ]
     data['performance'] = performance
 
-    model_features(data)
-    return
+#    model_features(data)
+#    return
 
 #    data.set_index('name',inplace=True)
 
@@ -78,8 +78,8 @@ def _main():
     y = data['Total Quality Leads'].values
     N = len(y)
 
-    model_file = 'model_{}_{}.pkl'.format(n_samples,filename)
     n_samples, n_tune = 50000,5000
+    model_file = 'model_{}_{}.pkl'.format(n_samples,filename)
     if not os.path.exists(model_file):
         with pm.Model() as model:
 #            ab = pm.HalfFlat('ab',shape=2,testval=np.asarray([1.,1.]))
@@ -125,11 +125,14 @@ def _main():
         pm.traceplot(burn_trace)
         plt.savefig('theta_trace.png')
         plt.figure()
-        pm.forestplot(burn_trace)
+        pm.forestplot(burn_trace, xtitle='95% credibles for conversion rate by experiment {}'.format(filename), chain_spacing=0.06,vline=1)
         plt.savefig('forest_trace.png')
         plt.figure()
         pm.plot_posterior(burn_trace)
         plt.savefig('posterior_trace.png')
+
+        res = pm.stats.summary(burn_trace)
+        res.to_csv('summary_stats_{}.csv'.format(filename))
         
         plt.figure()
         posteriors = []
